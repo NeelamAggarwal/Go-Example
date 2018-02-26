@@ -1,0 +1,3 @@
+steps:
+  - label: testing
+  - command: echo HI
