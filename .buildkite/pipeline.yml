@@ -8,7 +8,7 @@ steps:
 - label: Default Terraform pipeline
   command:
     - go build -o main .
-    - zip demo.zip main
-    - tubular artifact demo.zip
+    - zip deployment.zip main
+    - tubular artifact deployment.zip
   command:
     - tubular activate

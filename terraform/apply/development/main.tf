@@ -1,42 +1,59 @@
-
 provider "aws" {
-  region = "us-west-2"
+  region = "us-east-2"
 }
 
-resource "aws_lambda_function" "demo_lambda" {
-  function_name = "demo_lambda"
-
-  # The bucket name as created earlier with "aws s3api create-bucket"
-  #s3_bucket = "terraform-serverless-example"
-  #s3_key    = "v1.0.0/example.zip"
-
-  # "main" is the filename within the zip file (main.js) and "handler"
-  # is the name of the property under which the handler function was
-  # exported in that file.
-  handler = "demo.handler"
-  runtime = "go1.x"
-
-  role = "${aws_iam_role.lambda_exec.arn}"
+data "aws_iam_policy" "AmazonDynamoDBFullAccess" {
+  arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
-# IAM role which dictates what other AWS services the Lambda function
-# may access.
-resource "aws_iam_role" "lambda_exec" {
-  name = "serverless_example_lambda"
+data "aws_iam_policy" "CloudWatchLogsFullAccess" {
+  arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
+data "aws_iam_policy" "KinesisReadOnlyAccess" {
+  arn = "arn:aws:iam::aws:policy/AmazonKinesisReadOnlyAccess"
 }
-EOF
+
+
+# Pipeline: API gateway to Lambda to  Kinesis
+module "apigw-lambda-kinesis" {
+  source = "git@github.com:sendgrid-ops/terraform-modules.git//apigw-lambda-kinesis"
+  aws_kinesis_stream_name = "KinesisStream1"
+  api_description = "MC Contacts API"
+  aws_kinesis_shard_count = "1"
+  lambda_function_filepath = "../../../deployment.zip"
+  api_name = "MC1"
+  aws_kinesis_retention_period = "24"
+  lambda_function_name = "LambdaFunction1"
+  lambda_env_vars = {CONTACTSAPI_LAMBDACOMMAND   = "http_server"}
 }
+
+
+module "lambda" {
+  source      =  "git@github.com:sendgrid-ops/terraform-modules.git//lambda"
+  filepath = "../../../deployment.zip"
+  function_name = "LambdaFunction2"
+  env_vars = {CONTACTSAPI_LAMBDACOMMAND    = "kinesis_consumer"}
+
+  # Lambda policy
+  attach_policies = ["${data.aws_iam_policy.AmazonDynamoDBFullAccess.arn}", "${data.aws_iam_policy.CloudWatchLogsFullAccess.arn}", "${data.aws_iam_policy.KinesisReadOnlyAccess.arn}"]
+}
+
+
+# Add lambda as trigger to kinesis
+resource "aws_lambda_event_source_mapping" "event_source_mapping" {
+  batch_size        = 100
+  event_source_arn  = "${module.apigw-lambda-kinesis.kinesis_stream_arn}"
+  enabled           = true
+  function_name     = "${module.lambda.lambda_arn}"
+  starting_position = "TRIM_HORIZON"
+}
+
+
+module "dynamo" {
+  source = "../../modules/dynamo"
+  dynamo_min_write_capacity = "1"
+  dynamo_min_read_capacity = "1"
+  dynamo_contacts_table_name = "DynamoTable1"
+}
+
