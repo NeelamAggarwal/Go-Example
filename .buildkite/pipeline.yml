@@ -7,4 +7,4 @@ env:
 steps:
 - label: Default Terraform pipeline
   command:
-    - tubular activate'
+    - tubular activate
