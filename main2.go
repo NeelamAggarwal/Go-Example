@@ -54,7 +54,7 @@ func DeletePerson(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func main() {
+func main2() {
 	router := mux.NewRouter()
 	
 	people = append(people, Person{ID: "1", Firstname: "John", Lastname: "Doe", Address: &Address{City: "City X", State: "State X"}})
