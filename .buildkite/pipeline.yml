@@ -10,7 +10,7 @@ steps:
     - go build -o main .
     - zip deployment.zip main
     - tubular artifact deployment.zip
-#  command:
-#    - tubular activate
+  command:
+    - tubular activate
 #  command:
 #    - go test ./...
