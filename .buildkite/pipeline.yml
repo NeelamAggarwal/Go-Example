@@ -12,5 +12,5 @@ steps:
     - tubular artifact deployment.zip
 #  command:
 #    - tubular activate
-  command:
-    - go test ./...
+#  command:
+#    - go test ./...
