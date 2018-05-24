@@ -1,16 +1,11 @@
-steps:
-  - label: testing
-    command: echo "HI"
-
 env:
   TUBULAR_AWS_DEVELOPMENT_ACCOUNT_ID: "206187504452"
 steps:
-- label: Default Terraform pipeline
-  command:
+  - label: testing
+    command:
+    - echo "HI"
     - go build -o main .
     - zip deployment.zip main
     - tubular artifact deployment.zip
-  command:
     - tubular activate
-#  command:
-#    - go test ./...
+
