@@ -4,13 +4,15 @@ steps:
   - label: unit-test
     command: ./bin/start-unit-test.sh
 
-#env:
-#  TUBULAR_AWS_DEVELOPMENT_ACCOUNT_ID: "206187504452"
-#steps:
-#- label: Default Terraform pipeline
-#  command:
-#    - go build -o main .
-#    - zip deployment.zip main
-#    - tubular artifact deployment.zip
+env:
+  TUBULAR_AWS_DEVELOPMENT_ACCOUNT_ID: "206187504452"
+steps:
+- label: Default Terraform pipeline
+  command:
+    - go build -o main .
+    - zip deployment.zip main
+    - tubular artifact deployment.zip
 #  command:
 #    - tubular activate
+  command:
+    - go test ./...
