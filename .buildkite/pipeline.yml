@@ -7,9 +7,9 @@ steps:
 #    - wget https://raw.githubusercontent.com/canha/golang-tools-install-script/master/goinstall.sh
 #    - bash goinstall.sh --remove
 #    - bash goinstall.sh --64
-    - ./bin/install_go.sh
-    - source /var/lib/buildkite-agent/.bashrc
-    - go build -o main .
+#    - ./bin/install_go.sh
+#    - source /var/lib/buildkite-agent/.bashrc
+    - golang:1.9.2 go build -o main .
     - zip deployment.zip main
     - tubular artifact deployment.zip
 #    - tubular activate
