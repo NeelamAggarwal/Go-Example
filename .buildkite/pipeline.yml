@@ -6,6 +6,7 @@ steps:
     - echo "HI"
     - wget https://raw.githubusercontent.com/canha/golang-tools-install-script/master/goinstall.sh
     - bash goinstall.sh --64
+    - source /var/lib/buildkite-agent/.bashrc
     - go build -o main .
     - zip deployment.zip main
     - tubular artifact deployment.zip
