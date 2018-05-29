@@ -13,5 +13,5 @@ steps:
     - docker run --rm -v ${PWD}:/go/src/github.com/NeelamAggarwal/Go-Example:Z -w /go/src/github.com/NeelamAggarwal/Go-Example golang:1.9.2 go test ./...
     - zip deployment.zip main
     - tubular artifact deployment.zip
-#    - tubular activate
+    - tubular activate
 
