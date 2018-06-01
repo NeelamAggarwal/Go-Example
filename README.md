@@ -2,5 +2,6 @@
 
 
 # Go-Example
-Learn Go Language
+Learn Go Language throughly
+
 
